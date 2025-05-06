@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useCallback,
-  FormEvent,
-  ChangeEvent,
-} from "react";
+import { useEffect, useState, useCallback, ChangeEvent } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 type City = {
@@ -25,20 +19,34 @@ export default function Home() {
   const [orderby, setOrderby] = useState("name");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectedTimezon, setSelectedTimezon] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const loadCities = useCallback(async () => {
     const offset = page * 20;
-    // console.log(`Fetching cities ordered by ${orderby}`);
-
     try {
       setLoading(true);
-      const res = await fetch(
-        `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`
-      );
+
+      let url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`;
+
+      if (selectedCountries.length > 0) {
+        const countryFilters = selectedCountries
+          .map((c) => `refine=cou_name_en%3A%22${encodeURIComponent(c)}%22`)
+          .join("&");
+        url += `&${countryFilters}`;
+      }
+
+      if (selectedTimezon.length > 0) {
+        const timezoneFilters = selectedTimezon
+          .map((tz) => `refine=timezone%3A%22${encodeURIComponent(tz)}%22`)
+          .join("&");
+        url += `&${timezoneFilters}`;
+      }
+
+      const res = await fetch(url);
       const json = await res.json();
       const results: City[] = json.results || [];
-      // console.log(results);
-
+      console.log(results);
       if (results.length > 0) {
         setData((prev) => (page === 0 ? results : [...prev, ...results]));
         setPage((prev) => prev + 1);
@@ -51,7 +59,13 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [orderby, page]);
+  }, [orderby, page, selectedCountries, selectedTimezon]);
+
+  useEffect(() => {
+    setPage(0);
+    setData([]);
+    setHasMore(true);
+  }, [selectedCountries, selectedTimezon]);
 
   useEffect(() => {
     setPage(0);
@@ -63,7 +77,7 @@ export default function Home() {
     if (hasMore) {
       loadCities();
     }
-  }, [orderby]);
+  }, [orderby, selectedCountries, selectedTimezon]);
 
   // const filteredByCity = data.filter((city) =>
   //   city.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -78,7 +92,7 @@ export default function Home() {
     return true;
   });
 
-  console.log(`Cities ${filteredByCity.length}`);
+  // console.log(`Cities ${filteredByCity.length}`);
 
   const seenCountry = new Set();
 
@@ -89,7 +103,7 @@ export default function Home() {
     return true;
   });
 
-  console.log(`Country ${filteredByCountry.length}`);
+  // console.log(`Country ${filteredByCountry.length}`);
 
   const seentimezon = new Set();
 
@@ -100,7 +114,7 @@ export default function Home() {
     return true;
   });
 
-  console.log(`Timexzon ${filteredByTimezone.length}`);
+  // console.log(`Timexzon ${filteredByTimezone.length}`);
 
   const handleSelect = (cityName: string) => {
     setSearchTerm(cityName);
@@ -116,7 +130,7 @@ export default function Home() {
     setFilterOpen(true);
   };
 
-  const handleCheckboxChange = (
+  const handleCheckboxChangeForCountry = (
     e: ChangeEvent<HTMLInputElement>,
     countryName: string
   ) => {
@@ -127,12 +141,21 @@ export default function Home() {
         prev.filter((name) => name !== countryName)
       );
     }
+    setIsDropdownOpen(false);
   };
 
-  const handleFormCountry = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Selected countries:", selectedCountries);
-    // Submit selectedCountries to API or use as needed
+  const handleCheckboxChangeForTimezone = (
+    e: ChangeEvent<HTMLInputElement>,
+    timeZone: string
+  ) => {
+    if (e.target.checked) {
+      setSelectedTimezon((prev) => [...prev, timeZone]);
+    } else {
+      setSelectedTimezon((prev) =>
+        prev.filter((timezone) => timezone !== timeZone)
+      );
+    }
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -187,60 +210,82 @@ export default function Home() {
         </div>
         <div className="flex items-end justify-end">
           {filterOpen ? (
-            <div className="">
-              <form onSubmit={handleFormCountry}>
-                {filteredByCountry.map((item, index) => (
-                  <div key={index}>
-                    <input
-                      type="checkbox"
-                      id={`country-${index}`}
-                      name="country"
-                      value={item.cou_name_en}
-                      checked={selectedCountries.includes(item.cou_name_en)}
-                      onChange={(e) =>
-                        handleCheckboxChange(e, item.cou_name_en)
-                      }
-                    />
-                    <label htmlFor={`country-${index}`}>
-                      {item.cou_name_en}
-                    </label>
+            <div className="flex gap-2">
+              <div className="relative w-[15rem]">
+                {/* Select-like Button */}
+                <button
+                  type="button"
+                  className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left"
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                >
+                  {selectedCountries.length > 0
+                    ? selectedCountries.join(", ")
+                    : "Select country"}
+                </button>
+
+                {/* Dropdown List */}
+                {isDropdownOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow">
+                    {filteredByCountry.map((item, index) => (
+                      <div key={index} className="px-4 py-2 hover:bg-gray-50">
+                        <label className="inline-flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`country-${index}`}
+                            name="country"
+                            value={item.cou_name_en}
+                            checked={selectedCountries.includes(
+                              item.cou_name_en
+                            )}
+                            onChange={(e) =>
+                              handleCheckboxChangeForCountry(
+                                e,
+                                item.cou_name_en
+                              )
+                            }
+                          />
+                          <span>{item.cou_name_en}</span>
+                        </label>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+              </div>
+              <div className="relative w-[15rem]">
+                {/* Select-like Button */}
+                <button
+                  type="button"
+                  className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left"
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                >
+                  {selectedTimezon.length > 0
+                    ? selectedTimezon.join(", ")
+                    : "Select Timezone"}
+                </button>
 
-                <input type="submit" value="Submit" />
-              </form>
-
-              {/* <select
-                id="country"
-                value="country"
-                onChange={handleChange}
-                className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1"
-              >
-                {filteredByCountry.map((item, index) => (
-                  <option key={index} value="name">
-                    {item.cou_name_en}
-                  </option>
-                ))}
-              </select> */}
-              <select
-                id="timezone"
-                value="timezone"
-                onChange={handleChange}
-                className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1"
-              >
-                <option value="name">name</option>
-                <option value="timezone">timezone</option>
-                <option value="cou_name_en">coutnry</option>
-              </select>
-              <select
-                id="cities"
-                value="cities"
-                className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1"
-              >
-                <option value="name">name</option>
-                <option value="timezone">timezone</option>
-                <option value="cou_name_en">coutnry</option>
-              </select>
+                {/* Dropdown List */}
+                {isDropdownOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow">
+                    {filteredByTimezone.map((item, index) => (
+                      <div key={index} className="px-4 py-2 hover:bg-gray-50">
+                        <label className="inline-flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`timezon-${index}`}
+                            name="timezon"
+                            value={item.timezone}
+                            checked={selectedTimezon.includes(item.timezone)}
+                            onChange={(e) =>
+                              handleCheckboxChangeForTimezone(e, item.timezone)
+                            }
+                          />
+                          <span>{item.timezone}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             ""
