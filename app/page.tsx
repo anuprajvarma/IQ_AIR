@@ -17,6 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [orderby, setOrderby] = useState("name");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedTimezon, setSelectedTimezon] = useState<string[]>([]);
@@ -65,23 +66,17 @@ export default function Home() {
     setPage(0);
     setData([]);
     setHasMore(true);
-  }, [selectedCountries, selectedTimezon]);
-
-  useEffect(() => {
-    setPage(0);
-    setHasMore(true);
-    setData([]);
-  }, [orderby]);
+  }, [selectedCountries, selectedTimezon, searchTerm, orderby]);
 
   useEffect(() => {
     if (hasMore) {
       loadCities();
     }
-  }, [orderby, selectedCountries, selectedTimezon]);
+  }, [orderby, selectedCountries, selectedTimezon, searchTerm, hasMore]);
 
-  // const filteredByCity = data.filter((city) =>
-  //   city.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const filtered = data.filter((city) =>
+    city.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const seenCity = new Set();
 
@@ -121,9 +116,9 @@ export default function Home() {
     setShowSuggestions(false);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setOrderby(event.target.value);
-  };
+  // const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setOrderby(event.target.value);
+  // };
 
   const handleFilterSubmit = () => {
     // console.log(filterOpen);
@@ -175,9 +170,9 @@ export default function Home() {
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
             />
-            {showSuggestions && filteredByCity.length > 0 && (
+            {showSuggestions && filtered.length > 0 && (
               <ul className="absolute top-10 w-full max-h-60 overflow-auto bg-white border border-gray-300 shadow-lg z-10">
-                {filteredByCity.map((city, idx) => (
+                {filtered.map((city, idx) => (
                   <li
                     key={idx}
                     className="px-3 py-2 hover:bg-amber-100 cursor-pointer"
@@ -189,6 +184,7 @@ export default function Home() {
               </ul>
             )}
           </div>
+
           <div className="flex gap-2">
             <button
               className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1 cursor-pointer"
@@ -196,7 +192,45 @@ export default function Home() {
             >
               Filter
             </button>
-            <select
+            <div className="relative w-[15rem]">
+              {/* Select-like Button */}
+              <button
+                type="button"
+                className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left"
+                onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+              >
+                {orderby ? orderby : "Sort By"}
+              </button>
+
+              {/* Dropdown List */}
+              {isSortDropdownOpen && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow">
+                  {["name", "timezone", "country"].map((option) => (
+                    <div key={option} className="px-4 py-2 hover:bg-gray-50">
+                      <label className="inline-flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="orderby"
+                          value={option}
+                          checked={orderby === option}
+                          onChange={(e) => {
+                            if (e.target.value === "country") {
+                              setOrderby("cou_name_en");
+                            } else {
+                              setOrderby(e.target.value);
+                            }
+                            setIsSortDropdownOpen(false); // Close dropdown after selection
+                          }}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* <select
               id="orders"
               value={orderby}
               onChange={handleChange}
@@ -205,7 +239,7 @@ export default function Home() {
               <option value="name">name</option>
               <option value="timezone">timezone</option>
               <option value="cou_name_en">coutnry</option>
-            </select>
+            </select> */}
           </div>
         </div>
         <div className="flex items-end justify-end">
