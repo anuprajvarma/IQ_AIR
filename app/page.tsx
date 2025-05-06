@@ -15,9 +15,10 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const loadCities = async () => {
-    const offset = page * 10;
+    const offset = page * 20;
 
     try {
       const res = await fetch(
@@ -48,23 +49,40 @@ export default function Home() {
     city.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleSelect = (cityName: string) => {
+    setSearchTerm(cityName);
+    setShowSuggestions(false);
+  };
+
   return (
     <div className="text-gray-800 w-full min-h-screen flex justify-center items-start p-6">
       <main className="w-[60rem] flex flex-col gap-4">
-        <div className="flex gap-2 items-center mt-4">
+        <div className="flex flex-col w-[20rem] relative">
           <input
             type="search"
             placeholder="Search by city name"
-            className="border border-amber-500 w-[20rem] rounded-sm px-2 py-1"
+            className="border border-amber-500 rounded-sm px-2 py-1"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            list="autocomplete"
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
           />
-          <datalist id="autocomplete">
-            {filtered.slice(0, 10).map((city, idx) => (
-              <option key={idx} value={city.name} />
-            ))}
-          </datalist>
+          {showSuggestions && filtered.length > 0 && (
+            <ul className="absolute top-10 w-full max-h-60 overflow-auto bg-white border border-gray-300 shadow-lg z-10">
+              {filtered.map((city, idx) => (
+                <li
+                  key={idx}
+                  className="px-3 py-2 hover:bg-amber-100 cursor-pointer"
+                  onClick={() => handleSelect(city.name)}
+                >
+                  {city.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {loading ? (
@@ -82,7 +100,7 @@ export default function Home() {
               </div>
             }
             endMessage={
-              <p style={{ textAlign: "center" }}>
+              <p className="text-center font-medium text-gray-600">
                 <b>Yay! You have seen it all</b>
               </p>
             }
