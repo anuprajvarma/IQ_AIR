@@ -13,7 +13,7 @@ type WeatherData = {
 
 export default function CityDetailsPage() {
   const params = useParams();
-  const city = params.name as string; // dynamic route param from /[name]
+  const city = decodeURIComponent(params.name as string);
 
   const [weatherInfo, setWeatherInfo] = useState<WeatherData | null>(null);
 

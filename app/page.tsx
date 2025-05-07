@@ -412,7 +412,7 @@ export default function Home() {
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       <a
-                        href={`/city/${encodeURIComponent(item.name)}`}
+                        href={`/city/${item.name}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 underline"
