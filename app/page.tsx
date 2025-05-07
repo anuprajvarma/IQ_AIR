@@ -22,13 +22,20 @@ export default function Home() {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedTimezon, setSelectedTimezon] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const loadCities = useCallback(async () => {
+    console.log("loadcities");
     const offset = page * 20;
     try {
       setLoading(true);
-
-      let url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`;
+      let url = "";
+      if (debouncedSearch !== "") {
+        const encoded = encodeURIComponent(`%${debouncedSearch}%`);
+        url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}&where=name like "${encoded}"`;
+      } else {
+        url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`;
+      }
 
       if (selectedCountries.length > 0) {
         const countryFilters = selectedCountries
@@ -41,10 +48,12 @@ export default function Home() {
         const timezoneFilters = selectedTimezon
           .map((tz) => `refine=timezone%3A%22${encodeURIComponent(tz)}%22`)
           .join("&");
+        console.log(timezoneFilters);
         url += `&${timezoneFilters}`;
       }
 
       const res = await fetch(url);
+      console.log(res);
       const json = await res.json();
       const results: City[] = json.results || [];
       console.log(results);
@@ -60,19 +69,47 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [orderby, page, selectedCountries, selectedTimezon]);
+  }, [orderby, page, selectedCountries, selectedTimezon, debouncedSearch]);
+
+  // useEffect(() => {
+  //   if (debouncedSearch !== "") {
+  //     const encoded = encodeURIComponent(`%${debouncedSearch}%`);
+  //     const url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=0&order_by=name&where=name like "${encoded}"`;
+
+  //     console.log("API Call =>", url);
+  //     fetch(url)
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log("Results:", data.results);
+  //       });
+  //   }
+  // }, [debouncedSearch]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
     setPage(0);
     setData([]);
     setHasMore(true);
-  }, [selectedCountries, selectedTimezon, searchTerm, orderby]);
+  }, [
+    selectedCountries,
+    selectedTimezon,
+    searchTerm,
+    orderby,
+    debouncedSearch,
+  ]);
 
   useEffect(() => {
     if (hasMore) {
       loadCities();
     }
-  }, [orderby, selectedCountries, selectedTimezon, searchTerm, hasMore]);
+  }, [orderby, selectedCountries, selectedTimezon, hasMore, debouncedSearch]);
 
   const filtered = data.filter((city) =>
     city.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -152,6 +189,17 @@ export default function Home() {
     }
     setIsDropdownOpen(false);
   };
+
+  // const handleSearchCity = () => {
+  //   if (e.target.checked) {
+  //     setSelectedCountries((prev) => [...prev, countryName]);
+  //   } else {
+  //     setSelectedCountries((prev) =>
+  //       prev.filter((name) => name !== countryName)
+  //     );
+  //   }
+  //   setIsDropdownOpen(false);
+  // };
 
   return (
     <div className="text-gray-800 w-full min-h-screen flex justify-center items-start p-6">
