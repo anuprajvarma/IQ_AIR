@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 type WeatherData = {
   temp: number;
@@ -87,6 +88,16 @@ export default function CityDetailsPage() {
 
   const url = `https://openweathermap.org/img/wn/${weatherInfo?.icon}@2x.png`;
 
+  const containerStyle = {
+    width: "100%",
+    height: "20rem",
+  };
+
+  const center = {
+    lat: weatherInfo?.lat, // Replace with your latitude
+    lng: weatherInfo?.lon, // Replace with your longitude
+  };
+
   if (!weatherInfo) return <div>Loading...</div>;
 
   return (
@@ -130,7 +141,19 @@ export default function CityDetailsPage() {
               </div>
             </div>
           </div>
-          <div className="w-[30rem]">asdf</div>
+          <div className="w-[30rem]">
+            <LoadScript
+              googleMapsApiKey={"AIzaSyA3gd1Jhq-5xo7IvZ_dCn9fiiLEefSiR6M"}
+            >
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={center}
+                zoom={13}
+              >
+                <Marker position={center} />
+              </GoogleMap>
+            </LoadScript>
+          </div>
         </div>
       </div>
     </div>
