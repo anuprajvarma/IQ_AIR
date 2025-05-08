@@ -1,13 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, ChangeEvent } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-
-type City = {
-  cou_name_en: string;
-  timezone: string;
-  name: string;
-};
+import { InfiniteTablePage } from "@/components/tables";
+import { City } from "@/type/city";
+import { Loading } from "@/components/loading";
 
 export default function Home() {
   const [data, setData] = useState<City[]>([]);
@@ -71,24 +67,10 @@ export default function Home() {
     }
   }, [orderby, page, selectedCountries, selectedTimezon, debouncedSearch]);
 
-  // useEffect(() => {
-  //   if (debouncedSearch !== "") {
-  //     const encoded = encodeURIComponent(`%${debouncedSearch}%`);
-  //     const url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=0&order_by=name&where=name like "${encoded}"`;
-
-  //     console.log("API Call =>", url);
-  //     fetch(url)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         console.log("Results:", data.results);
-  //       });
-  //   }
-  // }, [debouncedSearch]);
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm.trim());
-    }, 500); // 500ms delay
+    }, 500);
 
     return () => clearTimeout(handler);
   }, [searchTerm]);
@@ -124,8 +106,6 @@ export default function Home() {
     return true;
   });
 
-  // console.log(`Cities ${filteredByCity.length}`);
-
   const seenCountry = new Set();
 
   const filteredByCountry = data.filter((item) => {
@@ -134,8 +114,6 @@ export default function Home() {
     seenCountry.add(tz);
     return true;
   });
-
-  // console.log(`Country ${filteredByCountry.length}`);
 
   const seentimezon = new Set();
 
@@ -146,19 +124,12 @@ export default function Home() {
     return true;
   });
 
-  // console.log(`Timexzon ${filteredByTimezone.length}`);
-
   const handleSelect = (cityName: string) => {
     setSearchTerm(cityName);
     setShowSuggestions(false);
   };
 
-  // const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setOrderby(event.target.value);
-  // };
-
   const handleFilterSubmit = () => {
-    // console.log(filterOpen);
     setFilterOpen(true);
   };
 
@@ -189,17 +160,6 @@ export default function Home() {
     }
     setIsDropdownOpen(false);
   };
-
-  // const handleSearchCity = () => {
-  //   if (e.target.checked) {
-  //     setSelectedCountries((prev) => [...prev, countryName]);
-  //   } else {
-  //     setSelectedCountries((prev) =>
-  //       prev.filter((name) => name !== countryName)
-  //     );
-  //   }
-  //   setIsDropdownOpen(false);
-  // };
 
   return (
     <div className="text-gray-800 w-full min-h-screen flex justify-center items-start p-6">
@@ -267,7 +227,7 @@ export default function Home() {
                             } else {
                               setOrderby(e.target.value);
                             }
-                            setIsSortDropdownOpen(false); // Close dropdown after selection
+                            setIsSortDropdownOpen(false);
                           }}
                         />
                         <span>{option}</span>
@@ -277,17 +237,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-
-            {/* <select
-              id="orders"
-              value={orderby}
-              onChange={handleChange}
-              className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1"
-            >
-              <option value="name">name</option>
-              <option value="timezone">timezone</option>
-              <option value="cou_name_en">coutnry</option>
-            </select> */}
           </div>
         </div>
         <div className="flex items-end justify-end">
@@ -374,57 +323,14 @@ export default function Home() {
           )}
         </div>
         {loading ? (
-          <div className="text-center text-lg text-orange font-semibold py-10">
-            Loading cities...
-          </div>
+          <Loading name="Cities" />
         ) : (
-          <InfiniteScroll
-            dataLength={data.length}
-            next={loadCities}
+          <InfiniteTablePage
+            dataLenth={data.length}
+            loadCities={loadCities}
             hasMore={hasMore}
-            loader={
-              <div className="text-center text-sm text-orange py-4">
-                Loading more cities...
-              </div>
-            }
-            endMessage={
-              <p className="text-center font-medium text-gray-600">
-                <b>Yay! You have seen it all</b>
-              </p>
-            }
-          >
-            <table className="border-collapse border border-gray-400 h-screen w-full">
-              <thead>
-                <tr>
-                  <th className="border border-gray-300 px-4 py-2">Country</th>
-                  <th className="border border-gray-300 px-4 py-2">Timezone</th>
-                  <th className="border border-gray-300 px-4 py-2">City</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredByCity.map((item, index) => (
-                  <tr key={index}>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {item.cou_name_en}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {item.timezone}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <a
-                        href={`/city/${item.name}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
-                      >
-                        {item.name}
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </InfiniteScroll>
+            filteredByCity={filteredByCity}
+          />
         )}
       </main>
     </div>

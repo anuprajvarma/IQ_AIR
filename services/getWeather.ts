@@ -1,21 +1,4 @@
-type WeatherData = {
-  name: string;
-  temp: number;
-  humidity: number;
-  pressure: number;
-  country: string;
-  description: string;
-  speed: number;
-  dt: number;
-  timezone: number;
-  lon: number;
-  lat: number;
-  icon: string;
-  feels_like: number;
-  visibility: number;
-  temp_min: number;
-  temp_max: number;
-};
+import { WeatherData } from "../type/weather";
 
 const apiKey = "367034bec150b66451287d887377c191";
 
