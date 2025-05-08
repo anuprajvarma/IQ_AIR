@@ -94,8 +94,8 @@ export default function CityDetailsPage() {
   };
 
   const center = {
-    lat: weatherInfo?.lat, // Replace with your latitude
-    lng: weatherInfo?.lon, // Replace with your longitude
+    lat: weatherInfo?.lat ?? 0, // Replace with your latitude
+    lng: weatherInfo?.lon ?? 0, // Replace with your longitude
   };
 
   if (!weatherInfo) return <div>Loading...</div>;
