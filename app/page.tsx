@@ -209,7 +209,7 @@ export default function Home() {
             <input
               type="search"
               placeholder="Search by city name"
-              className="border border-amber-500 rounded-sm px-2 py-1"
+              className="border border-orange rounded-sm px-2 py-1"
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -374,7 +374,7 @@ export default function Home() {
           )}
         </div>
         {loading ? (
-          <div className="text-center text-lg text-amber-600 font-semibold py-10">
+          <div className="text-center text-lg text-orange font-semibold py-10">
             Loading cities...
           </div>
         ) : (
@@ -383,7 +383,7 @@ export default function Home() {
             next={loadCities}
             hasMore={hasMore}
             loader={
-              <div className="text-center text-sm text-amber-600 py-4">
+              <div className="text-center text-sm text-orange py-4">
                 Loading more cities...
               </div>
             }
