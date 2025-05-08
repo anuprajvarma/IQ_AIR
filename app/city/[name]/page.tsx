@@ -2,9 +2,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { fetchWeatherByCity } from "../../lib/weatherService";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 type WeatherData = {
+  name: string;
   temp: number;
   humidity: number;
   pressure: number;
@@ -18,37 +20,37 @@ type WeatherData = {
   icon: string;
   feels_like: number;
   visibility: number;
+  temp_min: number;
+  temp_max: number;
 };
+
+const cities = [
+  "Paris",
+  "Tokyo",
+  "Singapore",
+  "Madrid",
+  "Rome",
+  "Delhi",
+  "Barcelona",
+  "Berlin",
+  "Sydney",
+  "London",
+  "New York",
+];
 
 export default function CityDetailsPage() {
   const params = useParams();
   const city = decodeURIComponent(params.name as string);
 
   const [weatherInfo, setWeatherInfo] = useState<WeatherData | null>(null);
+  const [weatherData, setWeatherData] = useState<{
+    [key: string]: WeatherData;
+  }>({});
 
   useEffect(() => {
-    const apiKey = "367034bec150b66451287d887377c191";
     const fetchWeather = async () => {
       try {
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
-        );
-        const data = await res.json();
-        const weatherDetails: WeatherData = {
-          temp: data.main.temp,
-          humidity: data.main.humidity,
-          pressure: data.main.pressure,
-          country: data.sys.country,
-          description: data.weather[0].description,
-          speed: data.wind.speed,
-          dt: data.dt,
-          timezone: data.timezone,
-          lon: data.coord.lon,
-          lat: data.coord.lat,
-          icon: data.weather[0].icon,
-          feels_like: data.main.feels_like,
-          visibility: data.visibility,
-        };
+        const weatherDetails = await fetchWeatherByCity(city);
         setWeatherInfo(weatherDetails);
       } catch (err) {
         console.error("Weather API Error:", err);
@@ -59,6 +61,14 @@ export default function CityDetailsPage() {
       fetchWeather();
     }
   }, [city]);
+
+  useEffect(() => {
+    cities.forEach((city) => {
+      fetchWeatherByCity(city)
+        .then((data) => setWeatherData((prev) => ({ ...prev, [city]: data })))
+        .catch(console.error);
+    });
+  }, []);
 
   function getFormattedLocalDateTime(dt: number, timezone: number): string {
     const localUnixTime = dt + timezone;
@@ -94,8 +104,8 @@ export default function CityDetailsPage() {
   };
 
   const center = {
-    lat: weatherInfo?.lat ?? 0, // Replace with your latitude
-    lng: weatherInfo?.lon ?? 0, // Replace with your longitude
+    lat: weatherInfo?.lat ?? 0,
+    lng: weatherInfo?.lon ?? 0,
   };
 
   if (!weatherInfo) return <div>Loading...</div>;
@@ -109,7 +119,7 @@ export default function CityDetailsPage() {
               <p className="text-orange">{formatted}</p>
               <p>
                 <strong>
-                  {city}, {weatherInfo.country}
+                  {weatherInfo.name}, {weatherInfo.country}
                 </strong>
               </p>
             </div>
@@ -154,6 +164,32 @@ export default function CityDetailsPage() {
               </GoogleMap>
             </LoadScript>
           </div>
+        </div>
+        <div>
+          <table className="w-full border mt-4">
+            <thead>
+              <tr>
+                <th className="border p-2">City</th>
+                <th className="border p-2">High (°C)</th>
+                <th className="border p-2">Low (°C)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cities.map((city) => (
+                <tr key={city}>
+                  <td className="border p-2">{city}</td>
+                  <td className="border p-2">
+                    {(weatherData[city]?.temp_max - 273.15).toFixed() ??
+                      "Loading..."}
+                  </td>
+                  <td className="border p-2">
+                    {(weatherData[city]?.temp_min - 273.15).toFixed() ??
+                      "Loading..."}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
