@@ -1,6 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type WeatherData = {
   temp: number;
@@ -84,6 +85,8 @@ export default function CityDetailsPage() {
     weatherInfo?.timezone ?? 0
   );
 
+  const url = `https://openweathermap.org/img/wn/${weatherInfo?.icon}@2x.png`;
+
   if (!weatherInfo) return <div>Loading...</div>;
 
   return (
@@ -101,7 +104,8 @@ export default function CityDetailsPage() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex gap-4">
-                <p>{weatherInfo.icon}</p>
+                <Image src={url} alt="weather icon" width={50} height={50} />
+
                 <p className="text-2xl">
                   {(weatherInfo.temp - 273.15).toFixed()} °C
                 </p>
