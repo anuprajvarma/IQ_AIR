@@ -49,7 +49,7 @@ export const Filter = ({
             <div className="flex justify-between bg-gray-100 border border-gray-300 w-full rounded px-4 py-2 text-left cursor-pointer">
               <button
                 type="button"
-                className="cursor-pointer"
+                className="cursor-pointer w-full text-left"
                 onClick={() => handleDropDown("country", isDropdownOpenCountry)}
               >
                 country{" "}
@@ -94,7 +94,7 @@ export const Filter = ({
             <div className="flex justify-between bg-gray-100 border border-gray-300 w-full rounded px-4 py-2 text-left cursor-pointer">
               <button
                 type="button"
-                className="cursor-pointer"
+                className="cursor-pointer w-full text-left"
                 onClick={() =>
                   handleDropDown("timezone", isDropdownOpenTimeZone)
                 }
