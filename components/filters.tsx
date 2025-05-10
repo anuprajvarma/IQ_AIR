@@ -1,12 +1,10 @@
 import { City } from "@/type/city";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 interface FilterType {
   filterOpen: boolean;
   selectedCountries: string[];
   selectedTimezon: string[];
-  isDropdownOpen: boolean;
-  setIsDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
   data: City[];
   setSelectedCountries: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedTimezon: React.Dispatch<React.SetStateAction<string[]>>;
@@ -14,14 +12,15 @@ interface FilterType {
 
 export const Filter = ({
   filterOpen,
-  setIsDropdownOpen,
+
   selectedCountries,
   selectedTimezon,
-  isDropdownOpen,
+
   data,
   setSelectedCountries,
   setSelectedTimezon,
 }: FilterType) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const seenCountry = new Set();
 
   const filteredByCountry = data.filter((item) => {
