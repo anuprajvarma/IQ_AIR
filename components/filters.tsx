@@ -1,14 +1,5 @@
-import { City } from "@/type/city";
+import { FilterType } from "@/type/types";
 import { ChangeEvent, useState } from "react";
-
-interface FilterType {
-  filterOpen: boolean;
-  selectedCountries: string[];
-  selectedTimezon: string[];
-  data: City[];
-  setSelectedCountries: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedTimezon: React.Dispatch<React.SetStateAction<string[]>>;
-}
 
 export const Filter = ({
   filterOpen,

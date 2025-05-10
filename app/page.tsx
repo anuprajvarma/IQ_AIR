@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { InfiniteTablePage } from "@/components/tables";
-import { City } from "@/type/city";
+import { City } from "@/type/types";
 import { Loading } from "@/components/loading";
 import { loadCities } from "@/services/getCities";
 import { Filter } from "@/components/filters";

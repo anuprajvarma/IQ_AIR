@@ -1,4 +1,4 @@
-import { WeatherData } from "../type/weather";
+import { WeatherData } from "../type/types";
 
 const apiKey = "367034bec150b66451287d887377c191";
 

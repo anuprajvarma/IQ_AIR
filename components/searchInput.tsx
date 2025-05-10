@@ -1,4 +1,4 @@
-import { City } from "@/type/city";
+import { Search } from "@/type/types";
 
 export const SearchInput = ({
   data,
@@ -6,13 +6,7 @@ export const SearchInput = ({
   searchTerm,
   setSearchTerm,
   setShowSuggestions,
-}: {
-  data: City[];
-  showSuggestions: boolean;
-  searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  setShowSuggestions: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+}: Search) => {
   const filtered = data.filter((city) =>
     city.name.toLowerCase().includes(searchTerm.toLowerCase())
   );

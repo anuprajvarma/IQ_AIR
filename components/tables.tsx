@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { City } from "@/type/city";
+import { Table, WeatherData } from "@/type/types";
 import { fetchWeatherByCity } from "@/services/getWeatherData";
-import { WeatherData } from "../type/weather";
-
-interface tableType {
-  dataLenth: number;
-  loadCities: VoidFunction;
-  hasMore: boolean;
-  filteredByCity: City[];
-}
 
 const cities = [
   "Paris",
@@ -30,7 +22,7 @@ export const InfiniteTablePage = ({
   loadCities,
   hasMore,
   filteredByCity,
-}: tableType) => {
+}: Table) => {
   return (
     <InfiniteScroll
       dataLength={dataLenth}

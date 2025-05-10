@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 
-import { WeatherData } from "@/type/weather";
+import { WeatherData } from "@/type/types";
 import { Loading } from "@/components/loading";
 import { getFormattedLocalDateTime } from "@/services/getLocalTime";
 import { fetchWeatherByCity } from "@/services/getWeatherData";
