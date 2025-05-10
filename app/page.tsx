@@ -19,7 +19,7 @@ export default function Home() {
   const [orderby, setOrderby] = useState("name");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const [selectedTimezon, setSelectedTimezon] = useState<string[]>([]);
+  const [selectedTimezon, setSelectedTimezon] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
@@ -106,8 +106,6 @@ export default function Home() {
         <Filter
           filterOpen={filterOpen}
           selectedCountries={selectedCountries}
-          selectedTimezon={selectedTimezon}
-          data={data}
           setSelectedCountries={setSelectedCountries}
           setSelectedTimezon={setSelectedTimezon}
         />

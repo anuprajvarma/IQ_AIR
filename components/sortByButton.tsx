@@ -17,15 +17,15 @@ export const SortBy = ({
   };
 
   return (
-    <div className="relative w-[15rem]">
+    <div className="relative w-[10rem]">
       <button
         type="button"
-        className={`w-full border border-gray-300 rounded px-4 py-2 text-left transition duration-200 cursor-pointer ${
+        className={`w-full border border-gray-300 rounded px-4 py-2 transition duration-200 cursor-pointer text-left ${
           isSortDropdownOpen ? "bg-gray-300" : "bg-gray-100"
         } `}
         onClick={handleDropDown}
       >
-        {orderby ? orderby : "Sort By"}
+        Sort By
       </button>
       {isSortDropdownOpen && (
         <div
@@ -41,11 +41,7 @@ export const SortBy = ({
                   className="cursor-pointer"
                   checked={orderby === option}
                   onChange={(e) => {
-                    if (e.target.value === "country") {
-                      setOrderby("cou_name_en");
-                    } else {
-                      setOrderby(e.target.value);
-                    }
+                    setOrderby(e.target.value);
                     setIsSortDropdownOpen(false);
                   }}
                 />

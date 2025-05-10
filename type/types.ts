@@ -41,8 +41,6 @@ export interface Search {
 export interface FilterType {
   filterOpen: boolean;
   selectedCountries: string[];
-  selectedTimezon: string[];
-  data: City[];
   setSelectedCountries: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedTimezon: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedTimezon: React.Dispatch<React.SetStateAction<string>>;
 }

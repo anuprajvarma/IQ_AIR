@@ -1,11 +1,11 @@
-import { City } from "@/type/city";
+import { City } from "@/type/types";
 
 interface LoadCitiesType {
   orderby: string;
   page: number;
   selectedCountries: string[];
   debouncedSearch: string;
-  selectedTimezon: string[];
+  selectedTimezon: string;
   setData: React.Dispatch<React.SetStateAction<City[]>>;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +24,10 @@ export const loadCities = async ({
   setLoading,
 }: LoadCitiesType) => {
   const offset = page * 20;
+  if (orderby == "country") {
+    orderby = "cou_name_en";
+  }
+  //   console.log(orderby);
   try {
     setLoading(true);
     let url = "";
@@ -42,12 +46,15 @@ export const loadCities = async ({
       url += `&${countryFilters}`;
     }
 
-    if (selectedTimezon.length > 0) {
-      const timezoneFilters = selectedTimezon
-        .map((tz) => `refine=timezone%3A%22${encodeURIComponent(tz)}%22`)
-        .join("&");
+    if (selectedTimezon) {
+      const timezoneFilters = `refine=timezone%3A%22${encodeURIComponent(
+        selectedTimezon
+      )}%22`;
+
       url += `&${timezoneFilters}`;
     }
+
+    // console.log(url);
 
     const res = await fetch(url);
     const json = await res.json();
