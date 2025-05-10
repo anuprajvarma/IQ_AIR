@@ -16,21 +16,23 @@ export const SearchInput = ({
     setShowSuggestions(false);
   };
   return (
-    <div className="flex flex-col w-[20rem] relative">
-      <input
-        type="search"
-        placeholder="Search by city name"
-        className="border border-orange rounded-sm px-2 py-1"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setShowSuggestions(true);
-        }}
-        onFocus={() => setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
-      />
+    <div className="flex flex-col relative">
+      <div className="border border-orange rounded-sm">
+        <input
+          type="search"
+          placeholder="Search by city name"
+          className="px-2 py-1 rounded-sm"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setShowSuggestions(true);
+          }}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+        />
+      </div>
       {showSuggestions && filtered.length > 0 && (
-        <ul className="absolute top-10 w-full max-h-60 overflow-auto bg-white border border-gray-300 shadow-lg z-10">
+        <ul className="absolute top-10  max-h-60 overflow-auto bg-white border border-gray-300 shadow-lg z-10">
           {filtered.map((city, idx) => (
             <li
               key={idx}
