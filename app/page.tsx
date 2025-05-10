@@ -19,6 +19,8 @@ export default function Home() {
   const [orderby, setOrderby] = useState("name");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [allCities, setAllCities] = useState<string[]>([]);
   const [selectedTimezon, setSelectedTimezon] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
@@ -39,6 +41,7 @@ export default function Home() {
     selectedCountries,
     selectedTimezon,
     searchTerm,
+    selectedCities,
     orderby,
     debouncedSearch,
   ]);
@@ -51,13 +54,21 @@ export default function Home() {
         selectedCountries,
         debouncedSearch,
         selectedTimezon,
+        selectedCities,
         setData,
         setPage,
         setHasMore,
         setLoading,
       });
     }
-  }, [debouncedSearch, selectedCountries, selectedTimezon, orderby, hasMore]);
+  }, [
+    debouncedSearch,
+    selectedCountries,
+    selectedTimezon,
+    orderby,
+    hasMore,
+    selectedCities,
+  ]);
 
   const seenCity = new Set();
 
@@ -106,7 +117,11 @@ export default function Home() {
         <Filter
           filterOpen={filterOpen}
           selectedCountries={selectedCountries}
+          allCities={allCities}
+          selectedCities={selectedCities}
+          setSelectedCities={setSelectedCities}
           setSelectedCountries={setSelectedCountries}
+          setAllCities={setAllCities}
           setSelectedTimezon={setSelectedTimezon}
         />
         {loading ? (
@@ -121,6 +136,7 @@ export default function Home() {
                 selectedCountries,
                 debouncedSearch,
                 selectedTimezon,
+                selectedCities,
                 setData,
                 setPage,
                 setHasMore,

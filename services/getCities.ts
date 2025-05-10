@@ -4,6 +4,7 @@ interface LoadCitiesType {
   orderby: string;
   page: number;
   selectedCountries: string[];
+  selectedCities: string[];
   debouncedSearch: string;
   selectedTimezon: string;
   setData: React.Dispatch<React.SetStateAction<City[]>>;
@@ -16,6 +17,7 @@ export const loadCities = async ({
   orderby,
   page,
   selectedCountries,
+  selectedCities,
   debouncedSearch,
   selectedTimezon,
   setData,
@@ -23,6 +25,8 @@ export const loadCities = async ({
   setHasMore,
   setLoading,
 }: LoadCitiesType) => {
+  const offsets = 0;
+  const orderBy = "population DESC";
   const offset = page * 20;
   if (orderby == "country") {
     orderby = "cou_name_en";
@@ -35,6 +39,16 @@ export const loadCities = async ({
     if (debouncedSearch !== "") {
       const encoded = encodeURIComponent(`%${debouncedSearch}%`);
       url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}&where=name like "${encoded}"`;
+    }
+    if (selectedCities.length > 0) {
+      console.log(selectedCities.length);
+      const where = selectedCities
+        .map((city) => `ascii_name="${city}"`)
+        .join(" OR ");
+
+      url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offsets}&order_by=${encodeURIComponent(
+        orderBy
+      )}&where=${encodeURIComponent(where)}`;
     } else {
       url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`;
     }
@@ -54,7 +68,19 @@ export const loadCities = async ({
       url += `&${timezoneFilters}`;
     }
 
-    // console.log(url);
+    // if (selectedCities.length > 0) {
+    //   const where = selectedCities
+    //     .map((city) => `ascii_name="${city}"`)
+    //     .join(" OR ");
+
+    //   url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offsets}&order_by=${encodeURIComponent(
+    //     orderBy
+    //   )}&where=${encodeURIComponent(where)}`;
+
+    //   console.log(`url ${url}`);
+    // }
+
+    // // console.log(url);
 
     const res = await fetch(url);
     const json = await res.json();
