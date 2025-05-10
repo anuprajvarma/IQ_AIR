@@ -21,6 +21,7 @@ export default function Home() {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedTimezon, setSelectedTimezon] = useState<string[]>([]);
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -68,7 +69,8 @@ export default function Home() {
   });
 
   const handleFilterSubmit = () => {
-    setFilterOpen(true);
+    setFilterOpen(!filterOpen);
+    setIsSortDropdownOpen(false);
   };
 
   return (
@@ -85,12 +87,20 @@ export default function Home() {
 
           <div className="flex gap-2">
             <button
-              className="w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1 cursor-pointer"
+              className={`w-[7rem] bg-gray-100 border border-gray-300 rounded px-2 py-1 cursor-pointer transition duration-200 ${
+                filterOpen ? "bg-gray-300" : "bg-gray-100"
+              }`}
               onClick={handleFilterSubmit}
             >
               Filter
             </button>
-            <SortBy orderby={orderby} setOrderby={setOrderby} />
+            <SortBy
+              orderby={orderby}
+              isSortDropdownOpen={isSortDropdownOpen}
+              setIsSortDropdownOpen={setIsSortDropdownOpen}
+              setOrderby={setOrderby}
+              setFilterOpen={setFilterOpen}
+            />
           </div>
         </div>
         <Filter
@@ -101,7 +111,6 @@ export default function Home() {
           setSelectedCountries={setSelectedCountries}
           setSelectedTimezon={setSelectedTimezon}
         />
-
         {loading ? (
           <Loading name="Cities" />
         ) : (

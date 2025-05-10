@@ -3,15 +3,14 @@ import { ChangeEvent, useState } from "react";
 
 export const Filter = ({
   filterOpen,
-
   selectedCountries,
   selectedTimezon,
-
   data,
   setSelectedCountries,
   setSelectedTimezon,
 }: FilterType) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpenCountry, setIsDropdownOpenCountry] = useState(false);
+  const [isDropdownOpenTimeZone, setIsDropdownOpenTimeZone] = useState(false);
   const seenCountry = new Set();
 
   const filteredByCountry = data.filter((item) => {
@@ -41,7 +40,7 @@ export const Filter = ({
         prev.filter((name) => name !== countryName)
       );
     }
-    setIsDropdownOpen(false);
+    setIsDropdownOpenCountry(false);
   };
 
   const handleCheckboxChangeForTimezone = (
@@ -55,7 +54,15 @@ export const Filter = ({
         prev.filter((timezone) => timezone !== timeZone)
       );
     }
-    setIsDropdownOpen(false);
+    setIsDropdownOpenTimeZone(false);
+  };
+
+  const handleDropDown = (name: string, r: boolean) => {
+    if (name === "country") {
+      setIsDropdownOpenCountry(!r);
+    } else {
+      setIsDropdownOpenTimeZone(!r);
+    }
   };
 
   return (
@@ -66,8 +73,8 @@ export const Filter = ({
             {/* Select-like Button */}
             <button
               type="button"
-              className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left cursor-pointer"
+              onClick={() => handleDropDown("country", isDropdownOpenCountry)}
             >
               {selectedCountries.length > 0
                 ? selectedCountries.join(", ")
@@ -75,13 +82,13 @@ export const Filter = ({
             </button>
 
             {/* Dropdown List */}
-            {isDropdownOpen && (
+            {isDropdownOpenCountry && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow">
                 {filteredByCountry.map((item, index) => (
                   <div key={index} className="px-4 py-2 hover:bg-gray-50">
                     <label className="inline-flex items-center space-x-2">
                       <input
-                        type="checkbox"
+                        type="radio"
                         id={`country-${index}`}
                         name="country"
                         value={item.cou_name_en}
@@ -101,8 +108,8 @@ export const Filter = ({
             {/* Select-like Button */}
             <button
               type="button"
-              className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              className="w-full bg-gray-100 border border-gray-300 rounded px-4 py-2 text-left cursor-pointer"
+              onClick={() => handleDropDown("timezone", isDropdownOpenTimeZone)}
             >
               {selectedTimezon.length > 0
                 ? selectedTimezon.join(", ")
@@ -110,13 +117,13 @@ export const Filter = ({
             </button>
 
             {/* Dropdown List */}
-            {isDropdownOpen && (
+            {isDropdownOpenTimeZone && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow">
                 {filteredByTimezone.map((item, index) => (
                   <div key={index} className="px-4 py-2 hover:bg-gray-50">
-                    <label className="inline-flex items-center space-x-2">
+                    <label className="inline-flex items-center space-x-2 cursor-pointer">
                       <input
-                        type="checkbox"
+                        type="radio"
                         id={`timezon-${index}`}
                         name="timezon"
                         value={item.timezone}
