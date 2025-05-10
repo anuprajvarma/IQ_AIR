@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { City } from "@/type/city";
-import { fetchWeatherByCity } from "@/services/getWeather";
+import { fetchWeatherByCity } from "@/services/getWeatherData";
 import { WeatherData } from "../type/weather";
 
 interface tableType {

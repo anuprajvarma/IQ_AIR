@@ -7,7 +7,7 @@ import Image from "next/image";
 import { WeatherData } from "@/type/weather";
 import { Loading } from "@/components/loading";
 import { getFormattedLocalDateTime } from "@/services/getLocalTime";
-import { fetchWeatherByCity } from "@/services/getWeather";
+import { fetchWeatherByCity } from "@/services/getWeatherData";
 import { Map } from "@/components/map";
 import { WeatherTable } from "@/components/tables";
 
