@@ -124,29 +124,30 @@ export default function Home() {
           setAllCities={setAllCities}
           setSelectedTimezon={setSelectedTimezon}
         />
-        {loading ? (
+        {/* {loading ? (
           <Loading name="Cities" />
-        ) : (
-          <InfiniteTablePage
-            dataLenth={data.length}
-            loadCities={() =>
-              loadCities({
-                orderby,
-                page,
-                selectedCountries,
-                debouncedSearch,
-                selectedTimezon,
-                selectedCities,
-                setData,
-                setPage,
-                setHasMore,
-                setLoading,
-              })
-            }
-            hasMore={hasMore}
-            filteredByCity={filteredByCity}
-          />
-        )}
+        ) : ( */}
+        <InfiniteTablePage
+          dataLenth={data.length}
+          loadCities={() =>
+            loadCities({
+              orderby,
+              page,
+              selectedCountries,
+              debouncedSearch,
+              selectedTimezon,
+              selectedCities,
+              setData,
+              setPage,
+              setHasMore,
+              setLoading,
+            })
+          }
+          hasMore={hasMore}
+          filteredByCity={filteredByCity}
+        />
+        {loading ? "" : <Loading name="Cities" />}
+        {/* )} */}
       </main>
     </div>
   );
