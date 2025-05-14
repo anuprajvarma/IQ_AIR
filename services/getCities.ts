@@ -37,11 +37,12 @@ export const loadCities = async ({
     let url = "";
 
     if (debouncedSearch !== "") {
-      const encoded = encodeURIComponent(`%${debouncedSearch}%`);
-      url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}&where=name like "${encoded}"`;
-    }
-    if (selectedCities.length > 0) {
-      console.log(selectedCities.length);
+      console.log(`debaounce ${debouncedSearch}`);
+      const encodedSearch = encodeURIComponent(`%${debouncedSearch}%`);
+      url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=name&where=name like "%25${encodedSearch}%25"
+`;
+    } else if (selectedCities.length > 0) {
+      console.log("cities");
       const where = selectedCities
         .map((city) => `ascii_name="${city}"`)
         .join(" OR ");
@@ -50,6 +51,7 @@ export const loadCities = async ({
         orderBy
       )}&where=${encodeURIComponent(where)}`;
     } else {
+      console.log("normal");
       url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offset}&order_by=${orderby}`;
     }
 
@@ -67,24 +69,11 @@ export const loadCities = async ({
 
       url += `&${timezoneFilters}`;
     }
-
-    // if (selectedCities.length > 0) {
-    //   const where = selectedCities
-    //     .map((city) => `ascii_name="${city}"`)
-    //     .join(" OR ");
-
-    //   url = `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?limit=20&offset=${offsets}&order_by=${encodeURIComponent(
-    //     orderBy
-    //   )}&where=${encodeURIComponent(where)}`;
-
-    //   console.log(`url ${url}`);
-    // }
-
-    // // console.log(url);
-
+    console.log(url);
     const res = await fetch(url);
     const json = await res.json();
     const results: City[] = json.results || [];
+    console.log(results);
 
     if (results.length > 0) {
       setData((prev) => (page === 0 ? results : [...prev, ...results]));

@@ -26,6 +26,7 @@ export default function Home() {
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
   useEffect(() => {
+    console.log("useEffect");
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm.trim());
     }, 500);
@@ -34,19 +35,20 @@ export default function Home() {
   }, [searchTerm]);
 
   useEffect(() => {
+    console.log("useEffect");
     setPage(0);
     setData([]);
     setHasMore(true);
   }, [
     selectedCountries,
     selectedTimezon,
-    searchTerm,
     selectedCities,
     orderby,
     debouncedSearch,
   ]);
 
   useEffect(() => {
+    console.log("useEffect");
     if (hasMore) {
       loadCities({
         orderby,
